@@ -31,7 +31,7 @@ deploy it locally using docker compose or plain PHP if you don't want to run it 
 3. [Environment Variables & Configuration](#environment-variables--configuration)
 4. [Usage](#usage)
 5. [Deploying on Kubernetes for Production Use](deploying-on-kubernetes-for-production-use)
-6. [Autoscaler Pod Sizing](#sizing-the-autoscaler-pod)
+6. [Generate a Read only user on your Kubernetes Cluster](#generating-a-read-only-user-on-your-kubernetes-cluster)
 7. [Credits](#credits)
 8. [Disclaimer](#disclaimer)
 
@@ -152,6 +152,57 @@ spec:
 The above manifest uses secrets to assign values to some of the 'secret' environment variables.
 
 You will need to create these.
+
+### Generate a Read only user on your Kubernetes Cluster
+The last thing you want to do is to give this utility a token with full access to your cluster.
+
+Use the following to create a read only service account on your cluster called 'aybak' that can retrieve node details:
+
+```
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aybak
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: aybak
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "watch", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: aybak
+subjects:
+  - kind: ServiceAccount
+    name: aybak
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: aybak
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aybak
+  namespace: default
+  annotations:
+    kubernetes.io/service-account.name: aybak
+type: kubernetes.io/service-account-token
+```
+
+Then, you can retrieve this user's token with the following:
+
+```
+kubectl get secret/aybak -o jsonpath='{.data.token}' -n default | base64 --decode
+```
 
 ### Credits
 * renoki-co/php-k8s
