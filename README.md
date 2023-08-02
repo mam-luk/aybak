@@ -1,7 +1,7 @@
 
 [![](https://img.shields.io/github/license/mam-luk/aybak.svg)](https://github.com/aybak/mamluk/blob/master/LICENSE)
 
-<p align="center"><img src=".mamluk/logo.svg" alt="Kipchak by Mamluk" title="Kipchak by Mamluk - an API Toolkit" height="150"/>
+<p align="center"><img src=".mamluk/logo.svg" alt="Kipchak by Mamluk" title="Kipchak by Mamluk - an API Toolkit" width="377"/>
 </p>
 
 # Aybak by Mamluk
