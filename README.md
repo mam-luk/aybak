@@ -31,7 +31,7 @@ deploy it locally using docker compose or plain PHP if you don't want to run it 
 3. [Environment Variables & Configuration](#environment-variables--configuration)
 4. [Usage](#usage)
 5. [Deploying on Kubernetes for Production Use](deploying-on-kubernetes-for-production-use)
-6. [Generate a Read only user on your Kubernetes Cluster](#generating-a-read-only-user-on-your-kubernetes-cluster)
+6. [Generate a Read only user on your Kubernetes Cluster](#generate-a-read-only-user-on-your-kubernetes-cluster)
 7. [Credits](#credits)
 8. [Disclaimer](#disclaimer)
 
