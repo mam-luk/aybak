@@ -1,0 +1,5 @@
+.idea/
+vendor/
+tmp/
+.env
+config.yaml

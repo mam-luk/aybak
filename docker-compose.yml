@@ -1,0 +1,13 @@
+version: '3'
+services:
+  extractor:
+    image: ghcr.io/mam-luk/aybak:latest
+    environment:
+      GIT_REPO: ${GIT_REPO}
+      GIT_HOSTNAME: ${GIT_HOSTNAME}
+      GIT_SSH_KEY: ${GIT_SSH_KEY}
+      QUERY_PERIOD: ${QUERY_PERIOD}
+      GIT_REPO_FILE_NAME: ${GIT_REPO_FILE_NAME}
+      K8S_CA: ${K8S_CA}
+      K8S_TOKEN: ${K8S_TOKEN}
+      K8S_CONTROL_PLANE: ${K8S_CONTROL_PLANE}

@@ -1,0 +1,119 @@
+#!/usr/bin/php
+<?php
+require_once realpath(__DIR__) . '/../vendor/autoload.php';
+
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use RenokiCo\PhpK8s\KubernetesCluster;
+use RenokiCo\PhpK8s\Kinds\K8sNode;
+use CzProject\GitPhp\Git;
+
+set_time_limit(0);
+declare(ticks = 1);
+pcntl_signal(SIGINT, function () {
+    exit(0);
+});
+
+/** Config **/
+$gitRepo = getenv('GIT_REPO');
+$gitHostname = getenv('GIT_HOSTNAME');
+$gitSshKey = getenv('GIT_SSH_KEY');
+$queryPeriod = (int) getenv('QUERY_PERIOD');
+$fileName = getenv('GIT_REPO_FILE_NAME');
+$k8sCa = getenv('K8S_CA');
+$k8sToken = getenv('K8S_TOKEN');
+$k8sControlPlane = getenv('K8S_CONTROL_PLANE');
+$rootDir = realpath(__DIR__ . '/../');
+$tmpPath = "/tmp/repoLoc";
+/***/
+
+$logger = new Logger('KUBERNETES');
+$logger->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
+$logger->info('Created Logger...');
+
+// Write SSH KEY to file so the Git Client has access to it.
+$logger->info('Writing SSH key for access to git repo...');
+file_put_contents("$rootDir/.ssh/id_rsa", $gitSshKey);
+shell_exec("chmod -R 400 $rootDir/.ssh");
+
+$logger->info('Writing Kubernetes Config file to query the Control Plane...');
+$configTemplate = file_get_contents("$rootDir/config.yaml.template");
+$configTemplate = str_replace(['<<k8s_ca>>', '<<k8s_control_plane>>', '<<k8s_token>>'],
+    [$k8sCa, $k8sControlPlane, $k8sToken], $configTemplate);
+file_put_contents("$rootDir/config.yaml", $configTemplate);
+
+$logger->info('Creating Kubernetes Client..');
+$cluster = KubernetesCluster::fromKubeConfigYamlFile("$rootDir/config.yaml");
+$logger->info('Building Kubernetes Config...');
+$git = new Git();
+shell_exec("ssh-keyscan -H $gitHostname >> /root/.ssh/known_hosts");
+if (is_dir($tmpPath)) {
+    $logger->info('Git repo already exists. Opening...');
+    $repository = $git->open($tmpPath);
+    if (is_dir($tmpPath)) {
+        if ($repository->hasChanges()) {
+            $repository->execute('reset');
+        }
+        $repository->pull('origin', ['--rebase']);
+    }
+} else {
+    $logger->info("Cloning git repo $gitRepo");
+    $repository = $git->cloneRepository($gitRepo, $tmpPath);
+    $repository->checkout('master');
+}
+shell_exec('cd ' . $tmpPath . ' && git config user.email "github@mamluk.net"');
+shell_exec('cd ' . $tmpPath . ' && git config user.name "Mamluk Bot"');
+
+/**
+ * @var $x An array containing all the nodes and their external and internal IPs
+ */
+
+while (true) {
+    $x = [];
+    try {
+        $logger->info('Get Nodes from Kubernetes API...');
+        $nodes = $cluster->node()->all();
+        foreach ($nodes as $node) {
+            /**
+             * @var $node K8sNode
+             */
+            $addresses = $node->getStatus('addresses');
+            $adx = [];
+            foreach ($addresses as $address) {
+                $adx[$address['type']] = $address['address'];
+            }
+
+            $x[] = $adx;
+        }
+
+        // All nodes are ready
+        $xJson = json_encode($x, JSON_PRETTY_PRINT);
+        file_put_contents("$tmpPath/$fileName", $xJson);
+
+        // Write nodes to git repo.
+        $repository->addAllChanges();
+
+        if ($repository->hasChanges()) {
+            $logger->info('Changes Detected..');
+            $logger->info('Push to git repo..');
+            $repository->commit("Updated nodes - $fileName");
+            shell_exec("ssh-keyscan -H $gitHostname > $rootDir/.ssh/known_hosts");
+            $repository->pull('origin', ['--rebase']);
+            $repository->push(['origin', 'master']);
+        }
+
+
+    } catch (Exception $e) {
+        $logger->error($e->getMessage());
+    }
+
+    $logger->info("Sleep for $queryPeriod seconds...");
+    sleep($queryPeriod);
+}
+
+
+
+
+
+
+
