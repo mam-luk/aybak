@@ -8,7 +8,7 @@
 # Aybak by Mamluk
 Aybak is a toolkit that comprises:
 
-* A single file utility connects to a Kubernetes cluster periodically and extracts the IP addresses of the worker nodes.
+* A single file utility that connects to a Kubernetes cluster periodically and extracts the IP addresses of the worker nodes.
 * It then writes these IP addresses to a git repo (configurable).
 * A set of GitHub Actions templates to help you configure the pipelines to update your load balancer (HA Proxy, in this case) with the new IPs. These pipelines templates are available at https://github.com/mam-luk/aybak-pipelines-template.
 
