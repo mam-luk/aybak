@@ -26,6 +26,10 @@ This utility is meant to be run as a Deployment (a cronjob will not work as 60 s
 The utility is fully dockerised (and written in PHP 8) and has a low resource footprint, so you can 
 deploy it locally using docker compose or plain PHP if you don't want to run it on a cluster.
 
+## A little detour in history - who was Sultan Aybak?
+
+Sultaz Izz al-Din Aybak (https://en.wikipedia.org/wiki/Aybak) was the first Sultan of the Mamluk Sultanate of Cairo, which succeeded the Ayybid Sultanta established by the famous Sultan Salah al-Din Ayyubid (https://en.wikipedia.org/wiki/Saladin) who won back Jerusalem from the Franks. Sultan Aybak ruled from 1250 to 257.
+
 ## Contents
 1. [Requirements](#requirements)
 2. [Docker Image](#published-docker-image)
