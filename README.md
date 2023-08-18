@@ -28,7 +28,7 @@ deploy it locally using docker compose or plain PHP if you don't want to run it 
 
 ## A little detour in history - who was Sultan Aybak?
 
-Sultaz Izz al-Din Aybak (https://en.wikipedia.org/wiki/Aybak) was the first Sultan of the Mamluk Sultanate of Cairo, which succeeded the Ayybid Sultanta established by the famous Sultan Salah al-Din Ayyubid (https://en.wikipedia.org/wiki/Saladin) who won back Jerusalem from the Franks. Sultan Aybak ruled from 1250 to 257.
+Sultaz Izz al-Din Aybak (https://en.wikipedia.org/wiki/Aybak) was the first Sultan of the Mamluk Sultanate of Cairo, which succeeded the Ayyubid Sultantate established by the famous Sultan Salah al-Din Ayyubid (https://en.wikipedia.org/wiki/Saladin) who won back Jerusalem from the Franks. Sultan Aybak ruled from 1250 to 257.
 
 ## Contents
 1. [Requirements](#requirements)
